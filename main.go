@@ -8,29 +8,20 @@ import (
 	"time"
 )
 
-type Book struct{
-	title string
-	author string
-	description string
-	release int
-	read bool
-	addBook time.Time
-	readFullBook *time.Time
-	
-}
+
 
 
 
 func main() {
 	ctx := context.Background()
 
-	book := Book{
-    title: "Война и мир",
-    author: "Толстой",
-    description: "что-то там про войну и мир",
-    release: 1869,
-    read: false,
-    addBook: time.Now(),
+	newBook := simple_sql.Book{
+    Title: "Мёртвые души",
+    Author: "Гогаль",
+    Description: "что-то там про Мёртвые души",
+    Release: 1869,
+    Read: false,
+    AddBook: time.Now(),
 }
 
 	conn,err := simple_connection.CreateConnection(ctx)
@@ -42,9 +33,45 @@ func main() {
 		panic(err)
 	}
 
- if err := simple_sql.InseartBook(ctx, conn, book.title, book.author, book.description, book.release, book.read, book.addBook); err !=nil{
+	books,err := simple_sql.GetBooks(ctx,conn)
+	if err !=nil{
+	  panic(err)
+	}
+
+  for _, b := range books {
+		if b.ID == 2 {
+			b.Title = "Сказка о царе султане"
+			b.Author = "Пушкин"
+			b.Description = "Что там о царе султане"
+			b.Release = 1800
+			b.Read = false
+			b.AddBook = time.Now()
+			now := time.Now()
+			b.ReadFullBook = &now
+
+			if err := simple_sql.UpdateBook(ctx,conn,b);err != nil{
+			panic(err)
+		  }
+		break
+	  }
+  }
+
+	allBooks,err := simple_sql.ListPages(ctx,conn,5)
+	if err != nil{
+		panic(err)
+	}
+
+	fmt.Println("Все книги полученные через пагинацию:",len(allBooks))
+
+ if err := simple_sql.InseartBook(ctx, conn,newBook); err !=nil{
 	panic(err)
  }
+ 
+ if err := simple_sql.DeleteBook(ctx,conn,2); err != nil{
+	panic(err)
+ }
+
+
 
 	fmt.Println("Работает хреновина")
 

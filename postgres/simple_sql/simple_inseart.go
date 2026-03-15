@@ -2,7 +2,6 @@ package simple_sql
 
 import (
 	"context"
-	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -10,11 +9,7 @@ import (
 
 
 func InseartBook(ctx context.Context,
-	conn *pgx.Conn,
-	title,author,description string,
-	release int,
-	read bool,
-	addBook time.Time) error {
+	conn *pgx.Conn,books Book) error {
 
 		
 
@@ -23,7 +18,7 @@ func InseartBook(ctx context.Context,
 		VALUES ($1,$2,$3,$4,$5,$6)
 		`
 
-		_,err := conn.Exec(ctx,sqlQuery,title,author,description,release,read,addBook)
+		_,err := conn.Exec(ctx,sqlQuery,books.Title,books.Author,books.Description,books.Release,books.Read,books.AddBook)
 
 		return err
 
